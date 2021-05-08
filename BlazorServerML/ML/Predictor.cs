@@ -7,7 +7,7 @@ namespace BlazorServerML.ML
 {
     public class Predictor
     {
-        readonly string MODEL_PATH = Startup.PATH + "/ML/CaliforniaHousingPrices.zip";
+        public readonly string MODEL_PATH = Startup.PATH + "/ML/HousingPrediction.zip";
 
         PredictionEngine<HousingData, HousingPrediction> _predictionEngine;
 
@@ -15,10 +15,7 @@ namespace BlazorServerML.ML
         {
             try {
                 var mlContext = new MLContext();
-
-                // Load model & create prediction engine
                 var mlModel = mlContext.Model.Load(MODEL_PATH, out _);
-
                 _predictionEngine = mlContext.Model.CreatePredictionEngine<HousingData, HousingPrediction>(mlModel);
 
             }
@@ -29,8 +26,7 @@ namespace BlazorServerML.ML
 
         public HousingPrediction Predict(HousingData input)
         {
-            if (_predictionEngine == null) {
-                // unexpected
+            if (_predictionEngine == null) {// unexpected
                 return null;
             }
             return _predictionEngine.Predict(input);

@@ -9,8 +9,4 @@
     <PackageReference Include="Microsoft.ML.LightGbm" Version="1.5.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>
