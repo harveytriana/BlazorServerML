@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BlazorServerML
 {
     public static class Utils
     {
-        public static string SplitCamelCase(string text)
+        /// <summary>
+        /// Split variable name in words
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string SplitName(string text)
         {
             return Regex.Replace(Regex.Replace(text, @"(\P{Ll})(\P{Ll}\p{Ll})", "$1 $2"), @"(\p{Ll})(\P{Ll})", "$1 $2");
         }

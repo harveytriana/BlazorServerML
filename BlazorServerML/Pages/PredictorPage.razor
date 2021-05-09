@@ -4,64 +4,63 @@
 
 <h3>California Housing Prices</h3>
 <hr />
-
 <div class="row">
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>Longitude</label>
+            <label>@Utils.SplitName(nameof(item.Longitude))</label>
             <input type="text" class="form-control" @bind="item.Longitude">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>Latitude</label>
+            <label>@Utils.SplitName(nameof(item.Longitude))</label>
             <input type="text" class="form-control" @bind="item.Latitude">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.HousingMedianAge))</label>
+            <label>@Utils.SplitName(nameof(item.HousingMedianAge))</label>
             <input type="text" class="form-control" @bind="item.HousingMedianAge">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.TotalRooms))</label>
+            <label>@Utils.SplitName(nameof(item.TotalRooms))</label>
             <input type="text" class="form-control" @bind="item.TotalRooms">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.TotalBedrooms))</label>
+            <label>@Utils.SplitName(nameof(item.TotalBedrooms))</label>
             <input type="text" class="form-control" @bind="item.TotalBedrooms">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.Population))</label>
+            <label>@Utils.SplitName(nameof(item.Population))</label>
             <input type="text" class="form-control" @bind="item.Population">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.Households))</label>
+            <label>@Utils.SplitName(nameof(item.Households))</label>
             <input type="text" class="form-control" @bind="item.Households">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.MedianIncome))</label>
+            <label>@Utils.SplitName(nameof(item.MedianIncome))</label>
             <input type="text" class="form-control" @bind="item.MedianIncome">
         </div>
     </div><div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.MedianHouseValue))</label>
+            <label>@Utils.SplitName(nameof(item.MedianHouseValue))</label>
             <input type="text" class="form-control" @bind="pred.PredictedPrice" readonly="readonly">
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="form-group">
-            <label>@Utils.SplitCamelCase(nameof(item.OceanProximity))</label>
+            <label>@Utils.SplitName(nameof(item.OceanProximity))</label>
             <select class="form-control" @bind="@item.OceanProximity">
                 <option value="NEAR BAY">NEAR BAY</option>
                 <option value="NEAR OCEAN">NEAR OCEAN</option>
@@ -75,7 +74,7 @@
                 class="btn btn-primary"
                 style="width:200px;margin-top:12px;"
                 @onclick="GetPrediction">
-            Get Prediction
+            Update Prediction
         </button>
     </div>
 </div>
@@ -89,6 +88,7 @@
 
     protected override void OnInitialized()
     {
+        // setup with a real data
         item = new HousingData() {
             Longitude = -122.23F,
             Latitude = 37.88F,
