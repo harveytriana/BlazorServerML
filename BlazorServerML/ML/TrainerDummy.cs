@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace BlazorServerML.ML
 {
@@ -6,38 +7,46 @@ namespace BlazorServerML.ML
     {
         public static readonly string
             TRAIN_FILE = "housing.csv",
-            TRAIN_PATH = Startup.PATH + "/Data/" + TRAIN_FILE;
+            TRAIN_PATH = Startup.PATH + "/Data/" + TRAIN_FILE,
+            MODEL_FILE = "TrainedModel.zip",
+            MODEL_PATH = Startup.PATH + "/Data/" + MODEL_FILE;
 
         #region Prompt
-        public delegate void PromptHandler(string message);
+        public delegate Task PromptHandler(string message);
         public PromptHandler Prompt;
-        void Echo(string message) => Prompt?.Invoke(message + "\n");
+       
         #endregion
 
-        public void CreateModel(string trainFile = null)
+        public async Task CreateModel(string trainFile = null)
         {
             if (trainFile == null) {
                 trainFile = TRAIN_PATH;
             }
 
-            Echo($"Processing file: {Path.GetFileName(trainFile)} | {new FileInfo(trainFile).Length:#,###,###} Bytes");
+            await Echo($"Processing file: {Path.GetFileName(trainFile)} | {new FileInfo(trainFile).Length:#,###,###} Bytes");
 
-            Echo("Loading data...");
+            await Echo("Loading data...");
 
-            Echo("Building pipeline...");
+            await Echo("Building pipeline...");
             // 2. Build training pipeline
 
-            Echo("Training model...");
+            await Echo("Training model...");
             // 3. Train Model
 
-            Echo("Evaluating model...");
+            await Echo("Evaluating model...");
             // 4. Evaluate quality of Model
 
-            Echo("Conclusion");
+            await Echo("Conclusion");
             // 5. Conclution
 
-            Echo("End of process");
+            await Echo("End of process");
         }
 
+        async Task Echo(string message)
+        {
+            Prompt?.Invoke(message + "\n");
+
+            await Task.Delay(1000);
+        }
     }
 }

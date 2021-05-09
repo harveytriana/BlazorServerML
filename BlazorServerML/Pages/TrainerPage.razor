@@ -30,16 +30,15 @@
         prompt = "";
 
         var trainer = new Trainer();
-        trainer.Prompt += (s) => AddPrompt(s);
-        trainer.CreateModel();
+        trainer.Prompt += AddPrompt;
+        await trainer.CreateModel();
 
-        await Task.Delay(2000);
         disabled = false;
     }
 
-    void AddPrompt(string text)
+    async Task AddPrompt(string text)
     {
         prompt += text;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 }
