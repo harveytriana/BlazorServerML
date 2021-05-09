@@ -5,31 +5,82 @@
 <h3>Predictor</h3>
 <hr />
 <div class="row">
-    @foreach (var (i, j) in Utils.GetNamesOf<HousingData>(item)) {
-        <div class="col-12 col-md-6">
-            <div class="form-group">
-                <label for="@i">@Utils.SplitCamelCase(i)</label>
-                <input type="text" class="form-control" name="@i" value="@j">
-            </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>Longitude</label>
+            <input type="text" class="form-control" @bind="item.Longitude">
         </div>
-    }
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>Latitude</label>
+            <input type="text" class="form-control" @bind="item.Latitude">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.HousingMedianAge))</label>
+            <input type="text" class="form-control" @bind="item.HousingMedianAge">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.TotalRooms))</label>
+            <input type="text" class="form-control" @bind="item.TotalRooms">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.TotalBedrooms))</label>
+            <input type="text" class="form-control" @bind="item.TotalBedrooms">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.Population))</label>
+            <input type="text" class="form-control" @bind="item.Population">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.Households))</label>
+            <input type="text" class="form-control" @bind="item.Households">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.MedianIncome))</label>
+            <input type="text" class="form-control" @bind="item.MedianIncome">
+        </div>
+    </div><div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.MedianHouseValue))</label>
+            <input type="text" class="form-control" @bind="pred.PredictedPrice">
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>@Utils.SplitCamelCase(nameof(item.OceanProximity))</label>
+            <input type="text" class="form-control" @bind="item.OceanProximity">
+        </div>
+    </div>
+
     <div class="col-12">
         <button type="submit"
                 class="btn btn-primary"
                 style="width:200px;margin-top:12px;"
                 @onclick="GetPrediction">
-            Submit
+            Get Prediction
         </button>
     </div>
 </div>
 <hr />
 <h4>Result</h4>
-@if (predictionResult == null) {
+@if (pred == null) {
     <p>Loading...</p>
 }
 else {
 <pre>
-    <b>Using model to make single prediction</b>
     Longitude           : @item.Longitude
     Latitude            : @item.Latitude
     Housing median age  : @item.HousingMedianAge
@@ -39,13 +90,13 @@ else {
     House holds         : @item.Households
     Median income       : @item.MedianIncome
     Ocean proximity     : @item.OceanProximity
-    Median house value  : @predictionResult.PredictedPrice (predicted)
+    Median house value  : @pred.PredictedPrice (predicted)
 </pre>
 }
 
 @code {
     HousingData item;
-    HousingPrediction predictionResult = new();
+    HousingPrediction pred = new();
 
     protected override void OnInitialized()
     {
@@ -60,12 +111,11 @@ else {
             MedianIncome = 8.3252F,
             OceanProximity = "NEAR BAY",
         };
-
-        predictionResult = _predictor.Predict(item);
+        GetPrediction();
     }
 
     void GetPrediction()
     {
-        predictionResult = _predictor.Predict(item);
+        pred = _predictor.Predict(item);
     }
 }
