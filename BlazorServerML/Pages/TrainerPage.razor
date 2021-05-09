@@ -1,7 +1,32 @@
 ﻿@page "/trainer"
+@using BlazorServerML.ML
 
 <h3>Trainer</h3>
+<hr />
+<h4>Current data file: @Trainer.TRAIN_FILE</h4>
 
+<button class="btn btn-primary"
+        style="width:200px;margin-top:12px;"
+        @onclick="ExecuteTraining">
+    Update Prediction
+</button>
+<h4>Work flow</h4>
+<pre>
+@prompt
+</pre>
 @code {
+    string prompt;
+
+    void ExecuteTraining()
+    {
+        var trainer = new Trainer();
+        trainer.Prompt += (s) => AddPrompt(s);
+        trainer.CreateModel();
+    }
+
+    void AddPrompt(string text)
+    {
+        prompt += text;
+    }
 
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.ML;
 using Microsoft.ML.Data;
@@ -10,37 +11,57 @@ namespace BlazorServerML.ML
     public class Trainer
     {
         public static readonly string
-            TRAIN_DATA = Startup.PATH + "/Data/housing.csv",
-            MODEL_PATH = Startup.PATH + "/ML/TrainedModel.zip";
+            TRAIN_FILE = "/Data/housing.csv",
+            TRAIN_PATH = Startup.PATH + "/Data/" + TRAIN_FILE,
+            MODEL_FILE = "TrainedModel.zip",
+            MODEL_PATH = Startup.PATH + "/Data/" + MODEL_FILE;
 
         readonly MLContext _ml = new(seed: 1);
 
-        // messages to container
+        #region Prompt
         public delegate void PromptHandler(string message);
         public PromptHandler Prompt;
-        //  Prompt?.Invoke("READY | KEYS Q-A: Player1, KEYS O-L: Player2");
+        void Echo(string message) => Prompt?.Invoke(message);
+        #endregion
 
-        public void CreateModel()
+        // quality control
+        double r2Average;
+        const double ACCEPTED_ACCURACY = 0.7;
+
+        public void CreateModel(string trainFile = null)
         {
+            if (trainFile == null) {
+                trainFile = TRAIN_PATH;
+            }
+
+            Echo($"Processing file: {trainFile} | {new FileInfo(trainFile).Length}");
+
+            Echo("Loading data...");
             // 1. Load Data
             var trainingDataView = _ml.Data.LoadFromTextFile<HousingData>(
-                path: TRAIN_DATA,
+                path: trainFile,
                 hasHeader: true,
                 separatorChar: ',',
                 allowQuoting: true,
                 allowSparse: false);
 
+            Echo("Building pipeline");
             // 2. Build training pipeline
             var trainingPipeline = BuildTrainingPipeline();
 
+            Echo("Training model");
             // 3. Train Model
             var mlModel = TrainModel(trainingDataView, trainingPipeline);
 
+            Echo("Evaluating model");
             // 4. Evaluate quality of Model
             Evaluate(trainingDataView, trainingPipeline);
 
-            // 5. Save model
-            SaveModel(mlModel, trainingDataView.Schema);
+            Echo("Conclusion");
+            // 5. Conclution
+            Conclution(mlModel, trainingDataView.Schema);
+
+            Echo("End of process");
         }
 
         IEstimator<ITransformer> BuildTrainingPipeline()
@@ -77,11 +98,11 @@ namespace BlazorServerML.ML
 
         ITransformer TrainModel(IDataView trainingDataView, IEstimator<ITransformer> trainingPipeline)
         {
-            Console.WriteLine("\nTraining model");
+            Echo("\nBegin training model");
 
             var model = trainingPipeline.Fit(trainingDataView);
 
-            Console.WriteLine("\nEnd of training process");
+            Echo("\nEnd of training process");
             return model;
         }
 
@@ -89,47 +110,45 @@ namespace BlazorServerML.ML
         {
             // Cross-Validate with single dataset (since we don't have two datasets, one for training and for evaluate)
             // in order to evaluate and get the model's accuracy metrics
-            Console.WriteLine("\nCross-validating to get model's accuracy metrics");
-            var crossValidationResults = _ml.Regression.CrossValidate(trainingDataView, trainingPipeline, numberOfFolds: 5, labelColumnName: "Label");
-            PrintRegressionFoldsAverageMetrics(crossValidationResults);
+
+            Echo("\nCross-validating to get model's accuracy metrics");
+            var crossValidationResults = _ml.Regression.CrossValidate(
+                trainingDataView,
+                trainingPipeline,
+                numberOfFolds: 5,
+                labelColumnName: "Label");
+            PromptAverageMetrics(crossValidationResults);
         }
 
-        void SaveModel(ITransformer mlModel, DataViewSchema modelInputSchema)
+        void Conclution(ITransformer mlModel, DataViewSchema modelInputSchema)
         {
-            Console.WriteLine("\nSave the model");
-            _ml.Model.Save(mlModel, modelInputSchema, MODEL_PATH);
+            if (r2Average < ACCEPTED_ACCURACY) {
+                Echo($"\nThe trained model has low accuracy, less than {ACCEPTED_ACCURACY}, and will not be published.");
+            }
+            else {
+                Echo("\nSave the model");
+                _ml.Model.Save(mlModel, modelInputSchema, MODEL_PATH);
+            }
         }
 
-        void PrintRegressionMetrics(RegressionMetrics metrics)
+        void PromptAverageMetrics(
+            IEnumerable<TrainCatalogBase.CrossValidationResult<RegressionMetrics>> crossValidationResults
+        )
         {
-            Console.WriteLine($"*************************************************");
-            Console.WriteLine($"*       Metrics for Regression model      ");
-            Console.WriteLine($"*------------------------------------------------");
-            Console.WriteLine($"*       LossFn:        {metrics.LossFunction:0.##}");
-            Console.WriteLine($"*       R2 Score:      {metrics.RSquared:0.##}");
-            Console.WriteLine($"*       Absolute loss: {metrics.MeanAbsoluteError:#.##}");
-            Console.WriteLine($"*       Squared loss:  {metrics.MeanSquaredError:#.##}");
-            Console.WriteLine($"*       RMS loss:      {metrics.RootMeanSquaredError:#.##}");
-            Console.WriteLine($"*************************************************");
-        }
-
-        void PrintRegressionFoldsAverageMetrics(IEnumerable<TrainCatalogBase.CrossValidationResult<RegressionMetrics>> crossValidationResults)
-        {
-            var L1 = crossValidationResults.Select(r => r.Metrics.MeanAbsoluteError);
-            var L2 = crossValidationResults.Select(r => r.Metrics.MeanSquaredError);
-            var RMS = crossValidationResults.Select(r => r.Metrics.RootMeanSquaredError);
+            var l1 = crossValidationResults.Select(r => r.Metrics.MeanAbsoluteError);
+            var l2 = crossValidationResults.Select(r => r.Metrics.MeanSquaredError);
+            var rms = crossValidationResults.Select(r => r.Metrics.RootMeanSquaredError);
             var lossFunction = crossValidationResults.Select(r => r.Metrics.LossFunction);
-            var R2 = crossValidationResults.Select(r => r.Metrics.RSquared);
+            var r2 = crossValidationResults.Select(r => r.Metrics.RSquared);
+            // QC
+            r2Average = r2.Average();
 
-            Console.WriteLine($"*************************************************************************************************************");
-            Console.WriteLine($"*       Metrics for Regression model      ");
-            Console.WriteLine($"*------------------------------------------------------------------------------------------------------------");
-            Console.WriteLine($"*       Average L1 Loss:       {L1.Average():0.###} ");
-            Console.WriteLine($"*       Average L2 Loss:       {L2.Average():0.###}  ");
-            Console.WriteLine($"*       Average RMS:           {RMS.Average():0.###}  ");
-            Console.WriteLine($"*       Average Loss Function: {lossFunction.Average():0.###}  ");
-            Console.WriteLine($"*       Average R-squared:     {R2.Average():0.###}  ");
-            Console.WriteLine($"*************************************************************************************************************");
+            Echo($"Metrics for Regression model");
+            Echo($"Average L1 Loss:       {l1.Average():0.###} ");
+            Echo($"Average L2 Loss:       {l2.Average():0.###}  ");
+            Echo($"Average RMS:           {rms.Average():0.###}  ");
+            Echo($"Average Loss Function: {lossFunction.Average():0.###}  ");
+            Echo($"Average R-squared:     {r2.Average():0.###}  ");
         }
     }
 }
