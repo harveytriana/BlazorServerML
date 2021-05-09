@@ -7,21 +7,11 @@ namespace BlazorServerML.ML
 {
     public class Predictor
     {
-        public readonly string MODEL_PATH = Startup.PATH + "/ML/HousingPrediction.zip";
-
         PredictionEngine<HousingData, HousingPrediction> _predictionEngine;
 
         public Predictor()
         {
-            try {
-                var mlContext = new MLContext();
-                var mlModel = mlContext.Model.Load(MODEL_PATH, out _);
-                _predictionEngine = mlContext.Model.CreatePredictionEngine<HousingData, HousingPrediction>(mlModel);
-
-            }
-            catch (Exception exception) {
-                Console.WriteLine("** Exception: " + exception.Message);
-            }
+            LoadModel();
         }
 
         public HousingPrediction Predict(HousingData input)
@@ -30,6 +20,20 @@ namespace BlazorServerML.ML
                 return null;
             }
             return _predictionEngine.Predict(input);
+        }
+
+        public void LoadModel()
+        {
+            _predictionEngine = null;
+            try {
+                var mlContext = new MLContext();
+                var mlModel = mlContext.Model.Load(Trainer.MODEL_PATH, out _);
+                _predictionEngine = mlContext.Model.CreatePredictionEngine<HousingData, HousingPrediction>(mlModel);
+
+            }
+            catch (Exception exception) {
+                Console.WriteLine("LoadModel Exception:\n" + exception.Message);
+            }
         }
     }
 }
