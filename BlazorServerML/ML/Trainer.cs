@@ -11,7 +11,7 @@ namespace BlazorServerML.ML
     public class Trainer
     {
         public static readonly string
-            TRAIN_FILE = "/Data/housing.csv",
+            TRAIN_FILE = "housing.csv",
             TRAIN_PATH = Startup.PATH + "/Data/" + TRAIN_FILE,
             MODEL_FILE = "TrainedModel.zip",
             MODEL_PATH = Startup.PATH + "/Data/" + MODEL_FILE;
@@ -21,7 +21,7 @@ namespace BlazorServerML.ML
         #region Prompt
         public delegate void PromptHandler(string message);
         public PromptHandler Prompt;
-        void Echo(string message) => Prompt?.Invoke(message);
+        void Echo(string message) => Prompt?.Invoke(message + "\n");
         #endregion
 
         // quality control
@@ -33,8 +33,7 @@ namespace BlazorServerML.ML
             if (trainFile == null) {
                 trainFile = TRAIN_PATH;
             }
-
-            Echo($"Processing file: {trainFile} | {new FileInfo(trainFile).Length}");
+            Echo($"Processing file: {Path.GetFileName(trainFile)} | {new FileInfo(trainFile).Length:#,###,###} Bytes");
 
             Echo("Loading data...");
             // 1. Load Data
@@ -45,15 +44,15 @@ namespace BlazorServerML.ML
                 allowQuoting: true,
                 allowSparse: false);
 
-            Echo("Building pipeline");
+            Echo("Building pipeline...");
             // 2. Build training pipeline
             var trainingPipeline = BuildTrainingPipeline();
 
-            Echo("Training model");
+            Echo("Training model...");
             // 3. Train Model
             var mlModel = TrainModel(trainingDataView, trainingPipeline);
 
-            Echo("Evaluating model");
+            Echo("Evaluating model...");
             // 4. Evaluate quality of Model
             Evaluate(trainingDataView, trainingPipeline);
 
@@ -98,11 +97,7 @@ namespace BlazorServerML.ML
 
         ITransformer TrainModel(IDataView trainingDataView, IEstimator<ITransformer> trainingPipeline)
         {
-            Echo("\nBegin training model");
-
             var model = trainingPipeline.Fit(trainingDataView);
-
-            Echo("\nEnd of training process");
             return model;
         }
 
@@ -126,8 +121,9 @@ namespace BlazorServerML.ML
                 Echo($"\nThe trained model has low accuracy, less than {ACCEPTED_ACCURACY}, and will not be published.");
             }
             else {
-                Echo("\nSave the model");
+                Echo("\nSaving the model...");
                 _ml.Model.Save(mlModel, modelInputSchema, MODEL_PATH);
+                Echo("\nReady Model");
             }
         }
 
@@ -144,11 +140,11 @@ namespace BlazorServerML.ML
             r2Average = r2.Average();
 
             Echo($"Metrics for Regression model");
-            Echo($"Average L1 Loss:       {l1.Average():0.###} ");
-            Echo($"Average L2 Loss:       {l2.Average():0.###}  ");
-            Echo($"Average RMS:           {rms.Average():0.###}  ");
-            Echo($"Average Loss Function: {lossFunction.Average():0.###}  ");
-            Echo($"Average R-squared:     {r2.Average():0.###}  ");
+            Echo($"Average L1 Loss:       {l1.Average():0.###}");
+            Echo($"Average L2 Loss:       {l2.Average():0.###}");
+            Echo($"Average RMS:           {rms.Average():0.###}");
+            Echo($"Average Loss Function: {lossFunction.Average():0.###}");
+            Echo($"Average R-squared:     {r2.Average():0.###}");
         }
     }
 }
