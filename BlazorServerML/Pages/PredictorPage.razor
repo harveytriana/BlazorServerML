@@ -4,32 +4,52 @@
 
 <h3>Predictor</h3>
 <hr />
+<div class="row">
+    @foreach (var (i, j) in Utils.GetNamesOf<HousingData>(item)) {
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label for="@i">@Utils.SplitCamelCase(i)</label>
+                <input type="text" class="form-control" name="@i" value="@j">
+            </div>
+        </div>
+    }
+    <div class="col-12">
+        <button type="submit"
+                class="btn btn-primary"
+                style="width:200px;margin-top:12px;"
+                @onclick="GetPrediction">
+            Submit
+        </button>
+    </div>
+</div>
+<hr />
+<h4>Result</h4>
 @if (predictionResult == null) {
     <p>Loading...</p>
 }
 else {
 <pre>
     <b>Using model to make single prediction</b>
-    Longitude           : @sampleData.Longitude
-    Latitude            : @sampleData.Latitude
-    Housing median age  : @sampleData.HousingMedianAge
-    Total rooms         : @sampleData.TotalRooms
-    Total bedrooms      : @sampleData.TotalBedrooms
-    Population          : @sampleData.Population
-    House holds         : @sampleData.Households
-    Median income       : @sampleData.MedianIncome
-    Ocean proximity     : @sampleData.OceanProximity
+    Longitude           : @item.Longitude
+    Latitude            : @item.Latitude
+    Housing median age  : @item.HousingMedianAge
+    Total rooms         : @item.TotalRooms
+    Total bedrooms      : @item.TotalBedrooms
+    Population          : @item.Population
+    House holds         : @item.Households
+    Median income       : @item.MedianIncome
+    Ocean proximity     : @item.OceanProximity
     Median house value  : @predictionResult.PredictedPrice (predicted)
 </pre>
 }
 
 @code {
-    HousingData sampleData;
-    HousingPrediction predictionResult;
+    HousingData item;
+    HousingPrediction predictionResult = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        sampleData = new HousingData() {
+        item = new HousingData() {
             Longitude = -122.23F,
             Latitude = 37.88F,
             HousingMedianAge = 41F,
@@ -40,14 +60,12 @@ else {
             MedianIncome = 8.3252F,
             OceanProximity = "NEAR BAY",
         };
-        // dummy test
-        predictionResult = new HousingPrediction {
-            PredictedPrice = 123456.25F
-        };
 
-        await Task.Delay(500);
+        predictionResult = _predictor.Predict(item);
+    }
 
-        predictionResult = _predictor.Predict(sampleData);
-
+    void GetPrediction()
+    {
+        predictionResult = _predictor.Predict(item);
     }
 }
