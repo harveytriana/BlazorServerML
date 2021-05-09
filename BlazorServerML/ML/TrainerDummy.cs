@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿// ===========================
+// BlazorSpread.net
+// ===========================
+using System.IO;
 using System.Threading.Tasks;
 
 namespace BlazorServerML.ML
@@ -14,6 +17,11 @@ namespace BlazorServerML.ML
         #region Prompt
         public delegate Task PromptHandler(string message);
         public PromptHandler Prompt;
+        async Task Echo(string message)
+        {
+            Prompt?.Invoke(message + "\n");
+            await Task.Delay(1000);
+        }
         #endregion
 
         public async Task CreateModel(string trainFile = null)
@@ -29,12 +37,6 @@ namespace BlazorServerML.ML
             await Echo("Evaluating model...");
             await Echo("Conclusion");
             await Echo("End of process");
-        }
-
-        async Task Echo(string message)
-        {
-            Prompt?.Invoke(message + "\n");
-            await Task.Delay(1000);
         }
     }
 }

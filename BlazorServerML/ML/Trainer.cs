@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿// ===========================
+// BlazorSpread.net
+// ===========================
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ML;
@@ -99,15 +102,12 @@ namespace BlazorServerML.ML
         {
             // Cross-Validate with single dataset (since we don't have two datasets, one for training and for evaluate)
             // in order to evaluate and get the model's accuracy metrics
-
             await Echo("\nCross-validating to get model's accuracy metrics");
             var crossValidationResults = _ml.Regression.CrossValidate(
                 trainingDataView,
                 trainingPipeline,
                 numberOfFolds: 5,
                 labelColumnName: "Label");
-
-            // report
             var l1 = crossValidationResults.Select(r => r.Metrics.MeanAbsoluteError);
             var l2 = crossValidationResults.Select(r => r.Metrics.MeanSquaredError);
             var rms = crossValidationResults.Select(r => r.Metrics.RootMeanSquaredError);
@@ -115,19 +115,19 @@ namespace BlazorServerML.ML
             var r2 = crossValidationResults.Select(r => r.Metrics.RSquared);
             // QC
             r2Average = r2.Average();
-
+            // report 
             await Echo($"Metrics for Regression model");
-            await Echo($"Average L1 Loss:       {l1.Average():0.###}");
-            await Echo($"Average L2 Loss:       {l2.Average():0.###}");
-            await Echo($"Average RMS:           {rms.Average():0.###}");
-            await Echo($"Average Loss Function: {lossFunction.Average():0.###}");
-            await Echo($"Average R-squared:     {r2.Average():0.###}\n");
+            await Echo($"Mean Absolute Error:     {l1.Average():0.###}");
+            await Echo($"Mean Squared Error:      {l2.Average():0.###}");
+            await Echo($"Root Mean Squared Error: {rms.Average():0.###}");
+            await Echo($"Average Loss Function:   {lossFunction.Average():0.###}");
+            await Echo($"Average R-squared:       {r2.Average():0.###}\n");
         }
 
         async Task Echo(string message)
         {
             Prompt?.Invoke(message + "\n");
-            // 
+            // asynchronous for the reactivity of the interface that receives the event
             await Task.Delay(100);
         }
     }
