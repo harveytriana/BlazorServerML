@@ -62,7 +62,12 @@
     <div class="col-12 col-md-6">
         <div class="form-group">
             <label>@Utils.SplitCamelCase(nameof(item.OceanProximity))</label>
-            <input type="text" class="form-control" @bind="item.OceanProximity">
+            <select class="form-control" @bind="@item.OceanProximity">
+                <option value="NEAR BAY">NEAR BAY</option>
+                <option value="NEAR OCEAN">NEAR OCEAN</option>
+                <option value="INLAND">INLAND</option>
+                <option value="LT 1H OCEAN">LT 1H OCEAN</option>
+            </select>
         </div>
     </div>
     <div class="col-12">
@@ -102,9 +107,4 @@
     {
         pred = _predictor.Predict(item);
     }
-
-    void OnChanged()
-        {
-
-        }
 }
