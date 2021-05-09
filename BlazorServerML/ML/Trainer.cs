@@ -30,10 +30,10 @@ namespace BlazorServerML.ML
             if (trainFile == null) {
                 trainFile = TRAIN_PATH;
             }
-            await Echo($"Processing file: {Path.GetFileName(trainFile)} | {new FileInfo(trainFile).Length:#,###,###} Bytes");
+            await Echo($"Processing file: {Path.GetFileName(trainFile)} | " +
+                       $"{new FileInfo(trainFile).Length:#,###,###} Bytes");
 
             await Echo ("Loading data...");
-            // 1. Load Data
             var trainingDataView = _ml.Data.LoadFromTextFile<HousingData>(
                 path: trainFile,
                 hasHeader: true,
@@ -42,29 +42,24 @@ namespace BlazorServerML.ML
                 allowSparse: false);
 
             await Echo ("Building pipeline...");
-            // 2. Build training pipeline
             var trainingPipeline = BuildTrainingPipeline();
 
             await Echo("Training model...");
-            // 3. Train Model
-            var mlModel = TrainModel(trainingDataView, trainingPipeline);
+            var model = trainingPipeline.Fit(trainingDataView); 
 
             await Echo ("Evaluating model...");
-
-            // 4. Evaluate quality of Model
             await Evaluate(trainingDataView, trainingPipeline);
 
             await Echo ("Conclusion");
-            // 5. Conclution
             if (r2Average < ACCEPTED_ACCURACY) {
-                await Echo ($"\nThe trained model has low accuracy, less than {ACCEPTED_ACCURACY}, and will not be published.");
+                await Echo ($"The trained model has low accuracy, less than {ACCEPTED_ACCURACY}, and will not be published.");
             }
             else {
+                await Echo($"\nThe trained model has acceptable accuracy and will be published.");
                 await Echo ("Saving the model...");
-                _ml.Model.Save(mlModel, trainingDataView.Schema, MODEL_PATH);
-                await Echo ($"Model file: {MODEL_FILE} | {new FileInfo(MODEL_PATH).Length:#,###,###} Bytes");
+                _ml.Model.Save(model, trainingDataView.Schema, MODEL_PATH);
+                await Echo ($"Model file was publishd as {MODEL_FILE} | {new FileInfo(MODEL_PATH).Length:#,###,###} Bytes");
             }
-
             await Echo ("End of process");
         }
 
@@ -98,12 +93,6 @@ namespace BlazorServerML.ML
             var trainingPipeline = dataProcessPipeline.Append(trainer);
 
             return trainingPipeline;
-        }
-
-        ITransformer TrainModel(IDataView trainingDataView, IEstimator<ITransformer> trainingPipeline)
-        {
-            var model = trainingPipeline.Fit(trainingDataView);
-            return model;
         }
 
         async Task Evaluate(IDataView trainingDataView, IEstimator<ITransformer> trainingPipeline)
