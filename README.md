@@ -527,7 +527,7 @@ Basically it is a form in which a user specifies the parameters and executes the
 ```
 *Page to run predictions*
 
-[](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_2.png)
+[](Screens/bz_ml_2.png)
 
 **Details**
 
