@@ -400,7 +400,7 @@ It presents the user interface so that through a command the training and public
 
 *Page to run the training*
 
-<img src="file:///C:/_study/Blog/Documents/Screens/bz_ml_1.png" title="" alt="" data-align="center">
+[](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_1.png)
 
 **Details**
 
@@ -527,7 +527,7 @@ Basically it is a form in which a user specifies the parameters and executes the
 ```
 *Page to run predictions*
 
-<img src="file:///C:/_study/Blog/Documents/Screens/bz_ml_2.png" title="" alt="" data-align="center">
+[](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_2.png)
 
 **Details**
 
