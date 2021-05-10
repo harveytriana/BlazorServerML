@@ -18,7 +18,7 @@ namespace BlazorServerML
 
         public static Dictionary<string, string> GetNamesOf<T>(T item) where T : class
         {
-            var r = new Dictionary<string, string>();
+            var namesOf = new Dictionary<string, string>();
             try {
                 foreach (PropertyInfo property in item.GetType().GetProperties()) {
                     var key = property.Name;
@@ -26,12 +26,12 @@ namespace BlazorServerML
                     if (property.PropertyType.Name == "Single") {
                         value = float.Parse(value).ToString("0.00");
                     }
-                    r.Add(key, value);
+                    namesOf.Add(key, value);
                 }
             }
             catch {
             }
-            return r;
+            return namesOf;
         }
     }
 

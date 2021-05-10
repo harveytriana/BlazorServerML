@@ -1,5 +1,6 @@
 ﻿@page "/trainer"
 @using BlazorServerML.ML
+@inject Predictor _predictor 
 
 <h3>Trainer</h3>
 <hr />
@@ -29,7 +30,7 @@
         disabled = true;
         prompt = "";
 
-        var trainer = new Trainer();
+        var trainer = new Trainer(_predictor);
         trainer.Prompt += AddPrompt;
         await trainer.CreateModel();
 

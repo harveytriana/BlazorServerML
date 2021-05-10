@@ -1,6 +1,7 @@
 ﻿// ===========================
 // BlazorSpread.net
 // ===========================
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,42 +29,61 @@ namespace BlazorServerML.ML
         double r2Average;
         const double ACCEPTED_ACCURACY = 0.7;
 
+        Predictor _predictor;
+
+        public Trainer(Predictor predictor)
+        {
+            _predictor = predictor;
+        }
+
         public async Task CreateModel(string trainFile = null)
         {
-            if (trainFile == null) {
-                trainFile = TRAIN_PATH;
+            try {
+                if (trainFile == null) {
+                    trainFile = TRAIN_PATH;
+                }
+                await Echo($"Processing file: {Path.GetFileName(trainFile)} |" +
+                           $"| {new FileInfo(trainFile).Length:#,###,###} Bytes");
+
+                await Echo("Loading data...");
+                var trainingDataView = _ml.Data.LoadFromTextFile<HousingData>(
+                    path: trainFile,
+                    hasHeader: true,
+                    separatorChar: ',',
+                    allowQuoting: true,
+                    allowSparse: false);
+
+                await Echo("Building pipeline...");
+                var trainingPipeline = BuildTrainingPipeline();
+
+                await Echo("Training model...");
+                var model = trainingPipeline.Fit(trainingDataView);
+
+                await Echo("Evaluating model...");
+                await Evaluate(trainingDataView, trainingPipeline);
+
+                await Echo("Conclusion");
+                if (r2Average < ACCEPTED_ACCURACY) {
+                    await Echo($"The trained model has low accuracy, less than " + 
+                               $"{ACCEPTED_ACCURACY}, and will not be published.");
+                }
+                else {
+                    await Echo($"The trained model has acceptable accuracy and will be published." +
+                               $"Saving the model...");
+                    _ml.Model.Save(model, trainingDataView.Schema, MODEL_PATH);
+                    await Echo($"Model file was publishd as {MODEL_FILE} " + 
+                               $"| {new FileInfo(MODEL_PATH).Length:#,###,###} Bytes");
+
+                    // update predictor engine
+                    _predictor.LoadModel();
+                    await Echo("Predictor engine was updated");
+                }
+                await Echo("End of process");
             }
-            await Echo($"Processing file: {Path.GetFileName(trainFile)} | " +
-                       $"{new FileInfo(trainFile).Length:#,###,###} Bytes");
-
-            await Echo ("Loading data...");
-            var trainingDataView = _ml.Data.LoadFromTextFile<HousingData>(
-                path: trainFile,
-                hasHeader: true,
-                separatorChar: ',',
-                allowQuoting: true,
-                allowSparse: false);
-
-            await Echo ("Building pipeline...");
-            var trainingPipeline = BuildTrainingPipeline();
-
-            await Echo("Training model...");
-            var model = trainingPipeline.Fit(trainingDataView); 
-
-            await Echo ("Evaluating model...");
-            await Evaluate(trainingDataView, trainingPipeline);
-
-            await Echo ("Conclusion");
-            if (r2Average < ACCEPTED_ACCURACY) {
-                await Echo ($"The trained model has low accuracy, less than {ACCEPTED_ACCURACY}, and will not be published.");
+            catch(Exception exception) {
+                await Echo($"Exception:\n{exception.Message}");
+                await Echo($"The process could not be completed.");
             }
-            else {
-                await Echo($"\nThe trained model has acceptable accuracy and will be published.");
-                await Echo ("Saving the model...");
-                _ml.Model.Save(model, trainingDataView.Schema, MODEL_PATH);
-                await Echo ($"Model file was publishd as {MODEL_FILE} | {new FileInfo(MODEL_PATH).Length:#,###,###} Bytes");
-            }
-            await Echo ("End of process");
         }
 
         IEstimator<ITransformer> BuildTrainingPipeline()
@@ -79,11 +99,11 @@ namespace BlazorServerML.ML
                 "Households",
                 "MedianIncome"
             };
-            var inputOutputColumns = new InputOutputColumnPair("OceanProximity", "OceanProximity");
+            var ioColumns = new InputOutputColumnPair("OceanProximity", "OceanProximity");
 
             // data process configuration with pipeline data transformations 
             var dataProcessPipeline = _ml
-                .Transforms.Categorical.OneHotEncoding(new[] { inputOutputColumns })
+                .Transforms.Categorical.OneHotEncoding(new[] { ioColumns })
                 .Append(_ml.Transforms.Concatenate("Features", feactures));
 
             // set the training algorithm 
@@ -100,8 +120,7 @@ namespace BlazorServerML.ML
 
         async Task Evaluate(IDataView trainingDataView, IEstimator<ITransformer> trainingPipeline)
         {
-            // Cross-Validate with single dataset (since we don't have two datasets, one for training and for evaluate)
-            // in order to evaluate and get the model's accuracy metrics
+            // Cross-Validate to evaluate and get the model's accuracy metrics
             await Echo("\nCross-validating to get model's accuracy metrics");
             var crossValidationResults = _ml.Regression.CrossValidate(
                 trainingDataView,
@@ -110,8 +129,8 @@ namespace BlazorServerML.ML
                 labelColumnName: "Label");
             var l1 = crossValidationResults.Select(r => r.Metrics.MeanAbsoluteError);
             var l2 = crossValidationResults.Select(r => r.Metrics.MeanSquaredError);
-            var rms = crossValidationResults.Select(r => r.Metrics.RootMeanSquaredError);
-            var lossFunction = crossValidationResults.Select(r => r.Metrics.LossFunction);
+            var ms = crossValidationResults.Select(r => r.Metrics.RootMeanSquaredError);
+            var lf = crossValidationResults.Select(r => r.Metrics.LossFunction);
             var r2 = crossValidationResults.Select(r => r.Metrics.RSquared);
             // QC
             r2Average = r2.Average();
@@ -119,8 +138,8 @@ namespace BlazorServerML.ML
             await Echo($"Metrics for Regression model");
             await Echo($"Mean Absolute Error:     {l1.Average():0.###}");
             await Echo($"Mean Squared Error:      {l2.Average():0.###}");
-            await Echo($"Root Mean Squared Error: {rms.Average():0.###}");
-            await Echo($"Average Loss Function:   {lossFunction.Average():0.###}");
+            await Echo($"Root Mean Squared Error: {ms.Average():0.###}");
+            await Echo($"Average Loss Function:   {lf.Average():0.###}");
             await Echo($"Average R-squared:       {r2.Average():0.###}\n");
         }
 
