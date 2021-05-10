@@ -545,4 +545,4 @@ This article is posted in »» https://www.blazorspread.net/blogview/running-mac
 
 ---
 
-`MIT license. Author: Harvey Triana. Contact: admin @ blazorspread.net`
+`MIT license. Author: Harvey Triana. Contact: admin@blazorspread.net`
