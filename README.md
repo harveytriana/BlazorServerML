@@ -541,7 +541,7 @@ The ML.NET library is a powerful tool for creating machine learning content for 
 
 ---
 
-This article is posted in »» [BlazorSpread.net](https://www.blazorspread.net) 
+This article belongs to the Blog »» [BlazorSpread.net](https://www.blazorspread.net) 
 
 ---
 
