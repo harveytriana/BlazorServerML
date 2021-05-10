@@ -345,7 +345,7 @@ namespace BlazorServerML.ML
 
 ### The Blazor Components
 
-Two Blazor pages are created, one for training and the other for getting predictions. We must bear in mind that the training component should be used by users with spatial privileges, since it is a specialized process.
+Two Blazor pages are created, one for training and the other for getting predictions. We must bear in mind that the training component should be used by users with special privileges, since it is a specialized process.
 
 #### The Trainer page
 
