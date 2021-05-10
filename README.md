@@ -400,7 +400,7 @@ It presents the user interface so that through a command the training and public
 
 *Page to run the training*
 
-[](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_1.png)
+![](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_1.png)
 
 **Details**
 
