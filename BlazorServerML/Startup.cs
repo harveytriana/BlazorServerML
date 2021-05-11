@@ -15,6 +15,8 @@ namespace BlazorServerML
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public static string PATH { get; private set; }
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
@@ -23,8 +25,6 @@ namespace BlazorServerML
 
             PATH = env.ContentRootPath;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940

@@ -68,8 +68,8 @@ namespace BlazorServerML.ML
                                $"{ACCEPTED_ACCURACY}, and will not be published.");
                 }
                 else {
-                    await Echo($"The trained model has acceptable accuracy and will be published." +
-                               $"Saving the model...");
+                    await Echo($"The trained model has acceptable accuracy and will be published.");
+                    await Echo($"Saving the model...");
                     _ml.Model.Save(model, trainingDataView.Schema, MODEL_PATH);
                     await Echo($"Model file was publishd as {MODEL_FILE} " + 
                                $"| {new FileInfo(MODEL_PATH).Length:#,###,###} Bytes");
