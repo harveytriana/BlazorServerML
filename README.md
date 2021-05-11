@@ -4,11 +4,11 @@
 
 ML is one of those programming subjects whose skill requires not only knowledge in advanced programming, but also in mathematics, data analysis, and logical thinking. I believe that it is one of those paradigms that require a study that goes beyond what can traditionally be learned in networks and communities.
 
-As a programmer and engineer I have often dealt with mathematics related to specific engineering problems, issues such as regressions, resolution of transcendental equations, algorithm programming, and the like. ML is specifically about finding a solution to a problem where there is no deductive linear solution, or it is not practical to treat it in those terms. On the contrary, ML applies inductive solutions, where the data goes first, and then the formulation. ML is not deterministic, in the sense that giving a specific solution, ML gives you a possible solution that must be the best.
+As a programmer and engineer I have often dealt with mathematics related to specific engineering problems, issues such as regressions, solving transcendental equations, algorithm programming, and the like. ML is specifically about finding a solution to a problem where there is no deductive linear solution, or it is not practical to treat it in those terms. On the contrary, ML applies inductive solutions, where the data goes first, and then the formulation. The ML is not deterministic, in the sense of giving a specific solution, the ML gives a possible solution that must be the best.
 
 I must confess that as a programmer I was interested in Python for this matter, and I learned that language. However, when I learned about ML.NET, I knew that I was going to go further with C#. The most popular is not equivalent to being the best. However, this opinion is personal, and perhaps biased in the sense that my experience in C# is extensive.
 
-I clarify that the purpose of this publication is not to teach how to use ML.NET, but to show how to create a clean and effective code to run ML.NET in a Blazor app. In what way should we code the workflow concerned, and in turn as a way to write the predictions module in Blazor. The first thing we are going to establish is that ML should always be backend. Here's how I'll use a server-side Blazor app to tackle the matter.
+I clarify that the purpose of this post is not to teach how to use ML.NET, but to show how to create a clean and effective code to run ML.NET in a Blazor application. In what way should we code the workflow concerned, and in turn I show a way of how the predictions module can be written in Blazor. The first thing we are going to establish is that ML should always be backend. This is how I will use a server-side Blazor application to address the issue raised.
 
 So far, Blazor WebAssembly, even version 6, does not run ML.NET; which is somewhat natural. Although, we can through a Web API consume an ML.NET model from Blazor WASM.
 
@@ -33,7 +33,7 @@ In general, an ML problem starts from a data matrix whose columns can be of diff
 
 As I mentioned, I took a classic example of supervised numerical analysis. It consists of predicting the value of a house based on multiple features. However, the example is not a copy of some source, it was treated in logic, and very much in the modern C# style.
 
-The data source is [California Housing Prices](https://www.kaggle.com/camnugent/california-housing-prices), from which in the data exploration I made a change in the labels of the `ocean_proximity` column , in particular I replaced the '>' character with LT (less than) so that it would not make noise when working with HTML as the trailing front end.
+The data source is [California Housing Prices](https://www.kaggle.com/camnugent/california-housing-prices), from which in the data exploration I made a change in the labels of the `ocean_proximity` column , in particular I replaced the '>' character with LT so that it would not make noise when working with HTML as the trailing front end.
 
 ### Application architecture
 
@@ -47,8 +47,6 @@ As we know, ML consists of working on two scenarios, the Trainer, and the Predic
 - Publication
 
 The detail of each of these steps is part of the general theory of ML. In particular, the third step, *Channeling behavior and algorithms*,  is what the data scientist does, and it is here that expertise and analytical skills make a difference, and make ML an art. The other points are certainly routine. We take into account that the training sequence can be repeated until the validation exceeds a qualitative threshold or, in other words, is acceptable.
-
-> As a detail, in the pipeline I included the text column `OceanProximity`,  something that some examples about the problem presented here, which I have seen do not include. In transformations, there are several models to transform information from text to numbers.
 
 To maintain order, organize the code for ML in a folder named ML.
 
@@ -290,6 +288,8 @@ namespace BlazorServerML.ML
 - The data file for the training can be changed, however, to simplify the example, this part was not added to the code. You can see that the `trainFile` parameter exists, which, if null, the data from *kaggle* will be used.
 
 - `Predictor` is passed as a parameter because if the model changes we must update the prediction engine, since` Predictor` acts as a service.
+
+- Included the text column `OceanProximity`. There are several models to transform information from text to numbers.
 
 ### Prediction
 
