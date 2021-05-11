@@ -345,7 +345,7 @@ namespace BlazorServerML.ML
 
 ### The Blazor Components
 
-Two Blazor pages are created, one for training and the other for getting predictions. We must bear in mind that the training component should be used by users with spatial privileges, since it is a specialized process.
+Two Blazor pages are created, one for training and the other for getting predictions. We must bear in mind that the training component should be used by users with special privileges, since it is a specialized process.
 
 #### The Trainer page
 
@@ -400,7 +400,7 @@ It presents the user interface so that through a command the training and public
 
 *Page to run the training*
 
-<img src="file:///C:/_study/Blog/Documents/Screens/bz_ml_1.png" title="" alt="" data-align="center">
+![](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_1.png)
 
 **Details**
 
@@ -527,7 +527,7 @@ Basically it is a form in which a user specifies the parameters and executes the
 ```
 *Page to run predictions*
 
-<img src="file:///C:/_study/Blog/Documents/Screens/bz_ml_2.png" title="" alt="" data-align="center">
+![](https://github.com/harveytriana/BlazorServerML/blob/master/Screens/bz_ml_2.png)
 
 **Details**
 
@@ -541,8 +541,8 @@ The ML.NET library is a powerful tool for creating machine learning content for 
 
 ---
 
-You can study the example repository »» [Repository](https://github.com/harveytriana/BlazorServerML)
+This article belongs to the Blog »» [BlazorSpread.net](https://www.blazorspread.net) 
 
 ---
 
-`MIT license. Author: Harvey Triana. Contact: admin @ blazorspread.net`
+`MIT license. Author: Harvey Triana. Contact: admin@blazorspread.net`
