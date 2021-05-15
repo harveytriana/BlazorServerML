@@ -1,6 +1,6 @@
-﻿# Running machine learning from Blazor
+﻿# Running machine learning from Blazor Server
 
-*An example of model training and data prediction using ML.NET from a Blazor application.*
+*An example of model training and data prediction using ML.NET from a Blazor Server application.*
 
 ML is one of those programming subjects whose skill requires not only knowledge in advanced programming, but also in mathematics, data analysis, and logical thinking. I believe that it is one of those paradigms that require a study that goes beyond what can traditionally be learned in networks and communities.
 
