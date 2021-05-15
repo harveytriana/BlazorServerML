@@ -279,7 +279,7 @@ namespace BlazorServerML.ML
 
 - In this code I add a quality control of the model, which determines that if the precision factor is less than 0.7, do not publish the model.
 
-- The files lie in the same application, in the `Data` folder. The way the root of the path is determined is special, it comes from capturing the value in `Startup.cs`,  and it is preserved in the static variable, PATH.
+- The files lie in the same application, in the `Data` folder. The way the root of the path is determined comes from capturing this value in `Startup.cs`,  and it is preserved in the static variable, PATH.
 
 - The evaluation uses *Cross-Validate*,  which in theory is more demanding and precise.
 
